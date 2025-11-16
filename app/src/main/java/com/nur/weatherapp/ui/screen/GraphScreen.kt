@@ -1,28 +1,62 @@
 package com.nur.weatherapp.ui.screen
 
-import androidx.compose.foundation.layout.*
+import android.util.Log
+import androidx.compose.animation.core.EaseInOutCubic
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import androidx.compose.ui.unit.sp
+import com.aay.compose.baseComponents.model.GridOrientation
+import com.aay.compose.lineChart.LineChart
+import com.aay.compose.lineChart.model.LineParameters
+import com.aay.compose.lineChart.model.LineType
 import com.nur.weatherapp.data.api.WeatherApiService
 import com.nur.weatherapp.data.model.ForecastItem
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ForecastScreen(
+fun GraphScreen(
     city: String,
+    // TODO: Navigation to other screens
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
@@ -56,7 +90,7 @@ fun ForecastScreen(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
-                title = { Text("Forecast for $city") },
+                title = { Text("Graph for $city") },
             )
         },
         bottomBar = {
@@ -75,7 +109,7 @@ fun ForecastScreen(
                     label = { Text("Current weather") }
                 )
                 NavigationBarItem(
-                    selected = true,
+                    selected = false,
                     icon = {
                         Icon(
                             imageVector = Icons.Default.Place,
@@ -85,13 +119,23 @@ fun ForecastScreen(
                     onClick = {},
                     label = { Text("Forecast") }
                 )
+                NavigationBarItem(
+                    selected = true,
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = "Graph"
+                        )
+                    },
+                    onClick = {},
+                    label = { Text("Graph") }
+                )
             }
         }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
+    ) {innerPadding ->
+        Box(modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxSize()
         ) {
             when {
                 isLoading -> {
@@ -124,14 +168,9 @@ fun ForecastScreen(
                     )
                 }
                 else -> {
-                    LazyColumn(
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(forecastList) { forecast ->
-                            ForecastCard(forecast = forecast)
-                        }
-                    }
+                    LineChartSample(
+                        forecastList = forecastList
+                    )
                 }
             }
         }
@@ -139,68 +178,52 @@ fun ForecastScreen(
 }
 
 @Composable
-fun ForecastCard(forecast: ForecastItem) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = formatDateTime(forecast.dateTime),
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = formatTime(forecast.dateTime),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+fun LineChartSample(
+    forecastList: List<ForecastItem>
+) {
 
-            AsyncImage(
-                model = "https://openweathermap.org/img/wn/${forecast.icon}@2x.png",
-                contentDescription = "Weather icon",
-                modifier = Modifier.size(60.dp)
-            )
+    val temperatures = forecastList.map {
+        it.temperature.coerceAtLeast(0.0)
+    }
+    val xAxisLabels = forecastList.map { formatTimeForGraph(it.dateTime) }
 
-            Column(
-                horizontalAlignment = Alignment.End,
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = "${forecast.temperature.toInt()}°C",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = forecast.description.replaceFirstChar { it.uppercase() },
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
+    Log.d("GraphScreen", "Temperatures: ${temperatures}")
+
+
+    val testLineParameters: List<LineParameters> = listOf(
+        LineParameters(
+            label = "Temp",
+            data = temperatures,
+            lineColor = Color.Blue,
+            lineType = LineType.CURVED_LINE,
+            lineShadow = true,
+        )
+    )
+
+    Box(Modifier.padding(16.dp)) {
+        LineChart(
+            modifier = Modifier.fillMaxSize(),
+            linesParameters = testLineParameters,
+            isGrid = true,
+            gridColor = Color.Gray,
+            xAxisData = xAxisLabels,
+            animateChart = true,
+            showGridWithSpacer = true,
+            yAxisStyle = TextStyle(
+                fontSize = 14.sp,
+                color = Color.Gray,
+            ),
+            xAxisStyle = TextStyle(
+                fontSize = 14.sp,
+                color = Color.Gray,
+                fontWeight = FontWeight.W400
+            ),
+            oneLineChart = false,
+            gridOrientation = GridOrientation.HORIZONTAL
+        )
     }
 }
-
-private fun formatDateTime(dateTime: String): String {
-    return try {
-        val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        val outputFormat = SimpleDateFormat("dd MMMM", Locale.ENGLISH)
-        val date = inputFormat.parse(dateTime)
-        date?.let { outputFormat.format(it) } ?: dateTime
-    } catch (e: Exception) {
-        dateTime
-    }
-}
-
-private fun formatTime(dateTime: String): String {
+private fun formatTimeForGraph(dateTime: String): String {
     return try {
         val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         val outputFormat = SimpleDateFormat("HH:mm", Locale.getDefault())

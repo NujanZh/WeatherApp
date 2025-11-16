@@ -4,9 +4,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
+import androidx.compose.material3.BottomAppBarDefaults.windowInsets
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,7 +26,8 @@ import com.nur.weatherapp.data.model.CurrentWeather
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurrentWeatherScreen(
-    onNavigateToForecast: (String) -> Unit
+    onNavigateToForecast: (String) -> Unit,
+    onNavigateToGraph: (String) -> Unit
 ) {
     val context = LocalContext.current
     val apiService = remember { WeatherApiService(context) }
@@ -68,6 +73,47 @@ fun CurrentWeatherScreen(
                 ),
                 title = { Text("Current Weather") }
             )
+        },
+        bottomBar = {
+            NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
+                NavigationBarItem(
+                    selected = true,
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Home,
+                            contentDescription = "Current weather"
+                        )
+                    },
+                    onClick = {},
+                    label = { Text("Current weather") }
+                )
+                NavigationBarItem(
+                    selected = false,
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Place,
+                            contentDescription = "Forecast"
+                        )
+                    },
+                    onClick = {
+                        onNavigateToForecast(cityName)
+                    },
+                    label = { Text("Forecast") }
+                )
+                NavigationBarItem(
+                    selected = false,
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = "Graph"
+                        )
+                    },
+                    onClick = {
+                        onNavigateToGraph(cityName)
+                    },
+                    label = { Text("Graph") }
+                )
+            }
         }
     ) { innerPadding ->
         Column(
@@ -108,14 +154,6 @@ fun CurrentWeatherScreen(
                     Icon(Icons.Default.Refresh, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Refresh")
-                }
-
-                Button(
-                    onClick = { onNavigateToForecast(cityName) },
-                    modifier = Modifier.weight(1f),
-                    enabled = currentWeather != null && !isLoading
-                ) {
-                    Text("Forecast")
                 }
             }
 

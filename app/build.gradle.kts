@@ -54,6 +54,7 @@ dependencies {
     implementation("com.android.volley:volley:1.2.1")
     implementation("io.coil-kt:coil-compose:2.5.0")
     implementation(libs.androidx.navigation.compose)
+    implementation("io.github.thechance101:chart:1.1.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

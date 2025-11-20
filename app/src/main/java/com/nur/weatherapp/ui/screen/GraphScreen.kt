@@ -50,6 +50,7 @@ import com.aay.compose.lineChart.model.LineType
 import com.nur.weatherapp.data.api.WeatherApiService
 import com.nur.weatherapp.data.model.ForecastItem
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -182,20 +183,30 @@ fun LineChartSample(
     forecastList: List<ForecastItem>
 ) {
 
-    val temperatures = forecastList.map {
-        it.temperature.coerceAtLeast(0.0)
+    val calendar = Calendar.getInstance()
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val today = dateFormat.format(calendar.time)
+
+    val todayForecast = forecastList.filter { forecast ->
+        forecast.dateTime.startsWith(today)
     }
-    val xAxisLabels = forecastList.map { formatTimeForGraph(it.dateTime) }
 
-    Log.d("GraphScreen", "Temperatures: ${temperatures}")
-    Log.d("GraphScreen", "xAxisLabels: ${xAxisLabels}")
+    val displayForecast = todayForecast.ifEmpty {
+        forecastList.take(8)
+    }
 
+    val temperatures = displayForecast.map { it.temperature }
 
-    val testLineParameters: List<LineParameters> = listOf(
+    val xAxisLabels = displayForecast.map { formatTimeForGraph(it.dateTime) }
+
+    Log.d("GraphScreen", "Temperatures: $temperatures")
+    Log.d("GraphScreen", "xAxisLabels: $xAxisLabels")
+
+    val lineParameters: List<LineParameters> = listOf(
         LineParameters(
-            label = "Temp",
-            data = listOf(17.73, 15.86, 14.06, 13.34, 12.19, 11.79),
-            lineColor = Color.Blue,
+            label = "Temperature °C",
+            data = temperatures,
+            lineColor = Color(0xFF2196F3),
             lineType = LineType.CURVED_LINE,
             lineShadow = true,
         )
@@ -204,10 +215,10 @@ fun LineChartSample(
     Box(Modifier.padding(16.dp)) {
         LineChart(
             modifier = Modifier.fillMaxSize(),
-            linesParameters = testLineParameters,
+            linesParameters = lineParameters,
             isGrid = true,
-            gridColor = Color.Gray,
-            xAxisData = listOf("12:00", "15:00", "18:00", "21:00", "00:00", "03:00"),
+            gridColor = Color.LightGray,
+            xAxisData = xAxisLabels,
             animateChart = true,
             showGridWithSpacer = true,
             yAxisStyle = TextStyle(
@@ -215,7 +226,7 @@ fun LineChartSample(
                 color = Color.Gray,
             ),
             xAxisStyle = TextStyle(
-                fontSize = 14.sp,
+                fontSize = 12.sp,
                 color = Color.Gray,
                 fontWeight = FontWeight.W400
             ),

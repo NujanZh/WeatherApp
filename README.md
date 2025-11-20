@@ -1,4 +1,3 @@
-<img width="295" height="769" alt="TAMZII_WEATHERAPP_01" src="https://github.com/user-attachments/assets/83562367-b7a8-49b1-a205-788dfce77b34" />
-<img width="282" height="767" alt="TAMZII_WEATHERAPP_02" src="https://github.com/user-attachments/assets/291e0599-86ba-4ea9-ae0e-d473aa80e43d" />
-<img width="271" height="768" alt="TAMZII_WEATHER_APP_03" src="https://github.com/user-attachments/assets/64dedd94-e472-4336-a381-cc35aa3687c1" />
-<img width="292" height="767" alt="TAMZII_WEATHER_APP_04" src="https://github.com/user-attachments/assets/8e0db0ea-f711-421e-afa3-198c87ac0f9c" />
+<img width="396" height="875" alt="Снимок экрана 2025-11-20 в 15 33 13" src="https://github.com/user-attachments/assets/6bed5469-8d28-46c6-881f-e5bd04fda825" />
+<img width="395" height="864" alt="Снимок экрана 2025-11-20 в 15 33 17" src="https://github.com/user-attachments/assets/f5f5a653-57ee-450d-856f-f35fe84ccc7b" />
+<img width="396" height="879" alt="Снимок экрана 2025-11-20 в 15 33 22" src="https://github.com/user-attachments/assets/86e5b426-3102-4442-9016-ba9c58c2795e" />

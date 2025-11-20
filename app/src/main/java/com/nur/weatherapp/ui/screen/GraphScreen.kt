@@ -188,12 +188,13 @@ fun LineChartSample(
     val xAxisLabels = forecastList.map { formatTimeForGraph(it.dateTime) }
 
     Log.d("GraphScreen", "Temperatures: ${temperatures}")
+    Log.d("GraphScreen", "xAxisLabels: ${xAxisLabels}")
 
 
     val testLineParameters: List<LineParameters> = listOf(
         LineParameters(
             label = "Temp",
-            data = temperatures,
+            data = listOf(17.73, 15.86, 14.06, 13.34, 12.19, 11.79),
             lineColor = Color.Blue,
             lineType = LineType.CURVED_LINE,
             lineShadow = true,
@@ -206,7 +207,7 @@ fun LineChartSample(
             linesParameters = testLineParameters,
             isGrid = true,
             gridColor = Color.Gray,
-            xAxisData = xAxisLabels,
+            xAxisData = listOf("12:00", "15:00", "18:00", "21:00", "00:00", "03:00"),
             animateChart = true,
             showGridWithSpacer = true,
             yAxisStyle = TextStyle(

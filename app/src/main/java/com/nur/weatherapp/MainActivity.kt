@@ -41,6 +41,11 @@ class MainActivity : ComponentActivity() {
                             city = city,
                             onNavigateBack = {
                                 navController.popBackStack()
+                            },
+                            onNavigateToGraph = { city ->
+                                navController.navigate("graph/$city") {
+                                    popUpTo("forecast/$city") { inclusive = false }
+                                }
                             }
                         )
                     }
@@ -50,6 +55,11 @@ class MainActivity : ComponentActivity() {
                             city = city,
                             onNavigateBack = {
                                 navController.popBackStack()
+                            },
+                            onNavigateToForecast = { city ->
+                                navController.navigate("forecast/$city") {
+                                    popUpTo("graph/$city") { inclusive = false }
+                                }
                             }
                         )
                     }

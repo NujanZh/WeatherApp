@@ -58,7 +58,8 @@ import java.util.Locale
 fun GraphScreen(
     city: String,
     // TODO: Navigation to other screens
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToForecast: (String) -> Unit
 ) {
     val context = LocalContext.current
     val apiService = remember { WeatherApiService(context) }
@@ -117,7 +118,9 @@ fun GraphScreen(
                             contentDescription = "Forecast"
                         )
                     },
-                    onClick = {},
+                    onClick = {
+                        onNavigateToForecast(city)
+                    },
                     label = { Text("Forecast") }
                 )
                 NavigationBarItem(
@@ -195,7 +198,9 @@ fun LineChartSample(
         forecastList.take(8)
     }
 
-    val temperatures = displayForecast.map { it.temperature }
+    val temperatures = displayForecast.map {
+        if (it.temperature < 0) 0.0 else it.temperature
+    }
 
     val xAxisLabels = displayForecast.map { formatTimeForGraph(it.dateTime) }
 

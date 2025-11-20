@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
@@ -23,7 +24,8 @@ import java.util.*
 @Composable
 fun ForecastScreen(
     city: String,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToGraph: (String) -> Unit
 ) {
     val context = LocalContext.current
     val apiService = remember { WeatherApiService(context) }
@@ -84,6 +86,19 @@ fun ForecastScreen(
                     },
                     onClick = {},
                     label = { Text("Forecast") }
+                )
+                NavigationBarItem(
+                    selected = false,
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = "Graph"
+                        )
+                    },
+                    onClick = {
+                        onNavigateToGraph(city)
+                    },
+                    label = { Text("Graph") }
                 )
             }
         }
